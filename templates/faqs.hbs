@@ -1,0 +1,28 @@
+<section class="form-section coaches-section">
+  <div class="coach-header">
+    <h2 class="coach-title">Вопросы (FAQ)</h2>
+    <button class="btn-primary" onclick="openPopup('faqPopup')">+ Новый вопрос</button>
+  </div>
+  <div class="coach-list">
+    {{#each faqs}}
+    <a class="coach-card" data-id="{{this.id}}" data-type="faq">
+      <button class="delete-btn faq-{{this.id}}">&times;</button>
+      <h3>{{this.question}}</h3>
+      <p>{{this.answer}}</p>
+    </a>
+    {{/each}}
+  </div>
+</section>
+
+<!-- Скрытый контент для popup -->
+<div id="faqPopup" style="display: none">
+  <form method="POST">
+    <h3>Добавить вопрос</h3>
+    <input type="text" name="question" placeholder="Вопрос" required />
+    <textarea name="answer" placeholder="Ответ" rows="4" required></textarea>
+    <button type="submit">Создать</button>
+    <button type="button" onclick="closePopup()">Отмена</button>
+  </form>
+</div>
+
+<script src="/scripts/faqs.js"></script>

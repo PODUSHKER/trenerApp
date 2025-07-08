@@ -1,0 +1,60 @@
+<section class="form-section course-detail-section">
+    <div class="course-header">
+        <h2>{{course.title}}</h2>
+        <p class="course-detail-description">{{course.description}}</p>
+        <button class="btn-primary" onclick="openModuleForm()">+ Добавить модуль</button>
+    </div>
+
+    <!-- Форма добавления модуля -->
+    <div id="newModuleForm" style="display: none;">
+        <h3>Новый модуль</h3>
+        <form method="POST" id="addModuleForm">
+            <input type="text" name="title" placeholder="Название модуля" required />
+            <textarea name="description" placeholder="Описание модуля" rows="3"></textarea>
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+
+    <!-- Список модулей -->
+    {{#each modules}}
+    <div class="module-item" id="module_{{this.id}}">
+        <div class="module-header">
+            <h3>{{this.title}}</h3>
+            <p>{{this.description}}</p>
+            <button class="btn-secondary" onclick="openLessonForm({{this.id}})">+ Урок</button>
+        </div>
+
+        <!-- Форма добавления урока для модуля -->
+        <div class="new-lesson-form" id="newLessonForm_{{this.id}}" style="display: none;">
+            <h4>Новый урок</h4>
+            <form method="POST" onsubmit="submitLesson(event, {{this.id}})">
+                <input type="text" name="title" placeholder="Название урока" required />
+                <textarea name="content" placeholder="Содержимое урока" rows="4" required></textarea>
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
+
+        <!-- Список уроков -->
+        <div class="lesson-list">
+            {{#each this.lessons}}
+            <div class="lesson-item" id="lesson_{{this.id}}">
+                <div class="lesson-header" onclick="toggleLesson(this)">
+                    <h4>{{this.title}}</h4>
+                    <span class="toggle-arrow">▼</span>
+                </div>
+                <div class="lesson-content">
+                    <textarea data-id="{{this.id}}" class="lesson-edit-area">{{this.content}}</textarea>
+                    <span id="success-msg" style="color:#0f0"></span>
+                    <div class="lesson-actions">
+                        <button onclick="updateLesson({{this.id}})">💾 Сохранить</button>
+                        <button onclick="deleteLesson({{this.id}})">🗑️ Удалить</button>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+    {{/each}}
+</section>
+
+<script src="/scripts/course.js"></script>

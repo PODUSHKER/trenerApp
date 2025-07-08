@@ -1,0 +1,47 @@
+<section class="form-section coaches-section">
+  <div class="coach-header">
+    <h2 class="coach-title">Курсы</h2>
+    <button class="btn-primary" onclick="openPopup('coursePopup')">+ Новый курс</button>
+  </div>
+  <div class="coach-list">
+    {{#each courses}}
+    <a href="/course/{{this.id}}" class="coach-card" data-id="{{this.id}}" data-type="course">
+      <button class="delete-btn course-{{this.id}}">&times;</button>
+      <h3>{{this.title}}</h3>
+      <p class="course-description">{{this.shortDescription}}</p>
+    </a>
+    {{/each}}
+  </div>
+</section>
+
+<!-- POPUP создания курса -->
+<div id="coursePopup" style="display: none">
+  <form action="/createCourse" method="POST" id="courseForm">
+    <h3>Создать курс</h3>
+    <input type="text" name="title" class="courseTitle" placeholder="Название курса" required />
+    <textarea name="description" class="courseDescription" placeholder="Описание курса" rows="4" required></textarea>
+
+    <h4>Модули</h4>
+    <div id="moduleContainer"></div>
+
+    <div class="module-form">
+      <input type="text" id="moduleTitleInput" placeholder="Название модуля" />
+      <textarea id="moduleDescriptionInput" placeholder="Описание модуля" rows="2"></textarea>
+
+      <div class="lessonContainer"></div>
+
+      <div class="lesson-form">
+        <input type="text" id="lessonTitleInput" placeholder="Название урока" />
+        <textarea id="lessonContentInput" placeholder="Контент урока" rows="2"></textarea>
+        <button type="button" id="addLessonBtn">Добавить урок</button>
+      </div>
+
+      <button type="button" id="addModuleBtn">Добавить модуль</button>
+    </div>
+
+    <button type="submit">Создать курс</button>
+    <button type="button" onclick="closePopup()">Отмена</button>
+  </form>
+</div>
+
+<script src="/scripts/courses.js"></script>

@@ -1,0 +1,678 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  height: 100%;
+  overflow-x: hidden;
+  background: #f0f4f8;
+}
+
+.animated-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  opacity: 0.2;
+}
+
+.navbar {
+  display: flex;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 0;
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.navbar a:hover {
+  color: #00bcd4;
+}
+
+.content {
+  padding: 2rem;
+}
+
+.scroll-anchor {
+  scroll-margin-top: 70px;
+}
+
+/* Секции с контентом, выравнивание */
+.form-section,
+.login-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+/* Упрощённые стили для popup */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  /* небольшой отступ со всех сторон для мобильных */
+  box-sizing: border-box;
+}
+
+.popup-card {
+  background: white;
+  padding: 2.5rem 2rem 2rem 2rem;
+  border-radius: 15px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  /* больше расстояния между элементами */
+  position: relative;
+  animation: slideFadeIn 0.4s ease;
+  box-sizing: border-box;
+}
+
+.popup-card h3 {
+  margin: 0 0 0.8rem 0;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #222;
+  text-align: center;
+}
+
+.popup-card input,
+.popup-card textarea {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.popup-card input:focus,
+.popup-card textarea:focus {
+  outline: none;
+  border-color: #00bcd4;
+  box-shadow: 0 0 6px rgba(0, 188, 212, 0.4);
+}
+
+.popup-card button[type="submit"] {
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  padding: 0.9rem 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+.popup-card button[type="submit"]:hover {
+  background-color: #0097a7;
+}
+
+.popup-card button[type="button"] {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 0.2rem;
+  transition: color 0.2s;
+  width: 100%;
+}
+
+.popup-card button[type="button"]:hover {
+  color: #00bcd4;
+}
+
+.popup-close {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.popup-close:hover {
+  color: #00bcd4;
+}
+
+/* Заголовок и кнопка для списка тренеров и др */
+.coach-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.coach-title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #222;
+}
+
+.btn-primary {
+  background-color: #00bcd4;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #0097a7;
+}
+
+/* Список карточек (тренеры, курсы, и т.д.) */
+.coach-list {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Карточка */
+.coach-card {
+  background-color: #ffffffcc;
+  backdrop-filter: blur(5px);
+  padding: 1.2rem;
+  padding-right: 35px; /* место под крестик */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: #333;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.coach-card .delete-btn {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.2s ease;
+}
+
+.coach-card .delete-btn:hover {
+    color: #ff0000;
+}
+
+.not-clickable {
+  pointer-events: none;
+}
+
+.coach-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  background-color: #f8f8f8;
+}
+
+.coach-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.coach-card p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Секция с списком тренеров и прочее - контейнер с максимальной шириной */
+.coaches-section {
+  align-items: flex-start;
+  padding-top: 2rem;
+  flex-direction: column;
+  justify-content: normal;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Списки внутри курсов (уроки) */
+.lesson-sublist {
+  margin-top: 1rem;
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lesson-item {
+  font-size: 0.95rem;
+  color: #00bcd4;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.lesson-item:hover {
+  color: #0097a7;
+  text-decoration: underline;
+}
+
+.coach-profile ul {
+  list-style: none;
+  padding-left: 1rem;
+  margin-bottom: 2rem;
+}
+
+.coach-profile ul li::before {
+  content: '•';
+  color: #00bcd4;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+/* Анимация появления */
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.dashboard {
+  text-align: center;
+  margin-top: 3rem;
+  color: #222;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+.dashboard h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.welcome-user {
+  font-size: 1.25rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.user-login {
+  font-weight: 700;
+  color: #00bcd4;
+}
+
+#lessonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.lesson-input-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.lesson-input-wrapper input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.remove-lesson {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #c00;
+}
+
+.form-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-card h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  text-align: center;
+  color: #222;
+}
+
+.form-card input {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-card input:focus {
+  outline: none;
+  border-color: #00bcd4;
+  box-shadow: 0 0 6px rgba(0, 188, 212, 0.4);
+}
+
+.form-card button[type="submit"] {
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  padding: 0.9rem 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.form-card button[type="submit"]:hover {
+  background-color: #0097a7;
+}
+
+.course-description {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+/* course.hbs */
+
+
+
+.course-detail-section {
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  gap: 2rem;
+}
+
+.course-header {
+  max-width: 100%;
+}
+
+.course-header h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #222;
+}
+
+.course-detail-description {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  max-width: 100%;
+}
+
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.lesson-item {
+  background: #fff;
+  padding: 1rem 40rem 1rem 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.lesson-header {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: bold;
+  color: #00bcd4;
+}
+
+.toggle-arrow {
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+.lesson-content {
+  display: none;
+  flex-direction: column;
+  margin-top: 0.8rem;
+  gap: 0.5rem;
+}
+
+.lesson-content.open {
+  display: flex;
+}
+
+.lesson-edit-area {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.lesson-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.lesson-actions button {
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.lesson-actions button:hover {
+  background-color: #0097a7;
+}
+
+.new-lesson-form {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.new-lesson-form h3 {
+  margin-bottom: 1rem;
+}
+
+.new-lesson-form input,
+.new-lesson-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+}
+
+.new-lesson-form button {
+  background-color: #00bcd4;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.new-lesson-form button:hover {
+  background-color: #0097a7;
+}
+
+
+/* Стили для блока модуля */
+.module-item {
+  background-color: #ffffffcc;
+  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.module-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.module-header h3 {
+  font-size: 1.5rem;
+  color: #222;
+  margin: 0;
+}
+
+.module-header p {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+.module-header .btn-secondary {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  background-color: #eeeeee;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.module-header .btn-secondary:hover {
+  background-color: #ddd;
+}
+
+/* Стили для формы нового модуля */
+#newModuleForm {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+#newModuleForm h3 {
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  color: #222;
+}
+
+#newModuleForm input,
+#newModuleForm textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+#newModuleForm button {
+  background-color: #00bcd4;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+#newModuleForm button:hover {
+  background-color: #0097a7;
+}
+
+/* Стиль кнопок +урок, +модуль */
+.btn-secondary {
+  background-color: #eeeeee;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  cursor: pointer;
+  color: #333;
+  border: none;
+  font-weight: 500;
+}
+
+.btn-secondary:hover {
+  background-color: #ddd;
+}
+
+

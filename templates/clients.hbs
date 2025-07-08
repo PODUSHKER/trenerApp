@@ -1,0 +1,29 @@
+<section class="form-section coaches-section">
+  <div class="coach-header">
+    <h2 class="coach-title">Все клиенты</h2>
+    <button class="btn-primary" onclick="openPopup('coachPopup')">+ Добавить клиента</button>
+  </div>
+  <div class="coach-list">
+    {{#each clients}}
+    <a href="/client/{{this.id}}" class="coach-card" data-id="{{this.id}}" data-type="client">
+      <button class="delete-btn client-{{this.id}}">&times;</button>
+      <h3>{{this.fio}}</h3>
+      <p>{{this.phone}}</p>
+    </a>
+    {{/each}}
+  </div>
+</section>
+
+<!-- Скрытый контент для popup -->
+<div id="coachPopup" style="display: none">
+  <form method="post" class="trenerForm">
+    <h3>Добавить тренера</h3>
+    <input type="text" name="fio" placeholder="ФИО" required />
+    <input type="text" name="phone" placeholder="Номер телефона" required />
+    <button type="submit">Создать</button>
+    <button type="button" onclick="closePopup()">Отмена</button>
+  </form>
+</div>
+
+
+<script src="/scripts/clients.js"></script>

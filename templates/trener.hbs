@@ -1,0 +1,64 @@
+<section class="form-section">
+  <div class="coach-profile">
+    <h2>{{trener.fio}}</h2>
+    <p><strong>Телефон:</strong> {{trener.phone}}</p>
+
+    <hr>
+
+    <h3>Курсы, модули и уроки</h3>
+    {{#each courses}}
+      <div class="course-block" style="margin-bottom: 25px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+        <h4 style="margin: 0;">{{this.title}}</h4>
+        <p style="margin-top: 5px;">{{this.description}}</p>
+
+        {{#if this.modules.length}}
+          <ul style="margin-top: 10px; padding-left: 20px;">
+            {{#each this.modules}}
+              <li style="margin-bottom: 10px;">
+                <strong>{{this.title}}</strong> — {{this.description}}
+
+                {{#if this.lessons.length}}
+                  <ul style="margin-top: 5px; padding-left: 20px;">
+                    {{#each this.lessons}}
+                      <li>
+                        <strong>{{this.title}}</strong>: {{this.content}}
+                      </li>
+                    {{/each}}
+                  </ul>
+                {{else}}
+                  <p style="color: #888;">Нет уроков</p>
+                {{/if}}
+
+              </li>
+            {{/each}}
+          </ul>
+        {{else}}
+          <p style="color: #888;">Нет модулей</p>
+        {{/if}}
+      </div>
+    {{/each}}
+
+    <hr>
+
+    <h3>Записанные пользователи</h3>
+    <ul>
+      {{#each clients}}
+        <li>{{this.fio}} — {{this.phone}}</li>
+      {{/each}}
+    </ul>
+
+    <h3>FAQ от тренера</h3>
+    <ul>
+      {{#each faqs}}
+        <li><strong>{{this.question}}</strong>: {{this.answer}}</li>
+      {{/each}}
+    </ul>
+
+    <h3>Опросники</h3>
+    <ul>
+      {{#each pollings}}
+        <li>{{this.question}}</li>
+      {{/each}}
+    </ul>
+  </div>
+</section>

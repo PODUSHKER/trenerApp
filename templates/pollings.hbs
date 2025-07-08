@@ -1,0 +1,39 @@
+<section class="form-section coaches-section">
+  <div class="coach-header">
+    <h2 class="coach-title">Опросники</h2>
+    <button class="btn-primary" onclick="openPopup('pollingPopup')">+ Новый опрос</button>
+  </div>
+
+  <div class="coach-list">
+    {{#each pollings}}
+    <a class="coach-card" data-id="{{this.id}}" data-type="polling">
+      <button class="delete-btn polling-{{this.id}}">&times;</button>
+      <h3>{{this.question}}</h3>
+      <ul>
+        {{#each this.answers}}
+        <li>{{this.data}}</li>
+        {{/each}}
+      </ul>
+    </a>
+    {{/each}}
+  </div>
+</section>
+
+<!-- Скрытый popup для создания опроса -->
+<div id="pollingPopup" style="display: none;">
+  <form method="POST">
+    <h3>Создать опрос</h3>
+    <input type="text" name="question" id="question" placeholder="Вопрос" required />
+
+    <div id="answersContainer">
+      <input type="text" name="answers[]" placeholder="Ответ 1" required />
+    </div>
+
+    <button type="button" id="addAnswer">+ Добавить ответ</button>
+    <br><br>
+    <button type="submit">Создать</button>
+    <button type="button" onclick="closePopup()">Отмена</button>
+  </form>
+</div>
+
+<script src="/scripts/pollings.js"></script>
