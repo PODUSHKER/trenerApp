@@ -1,0 +1,83 @@
+<section class="form-section">
+    <div class="coach-profile">
+        <h2>{{client.fio}}</h2>
+        <p><strong>Телефон:</strong> {{client.phone}}</p>
+
+        <hr>
+
+        <h3>Курсы, модули и уроки</h3>
+        {{#each courses}}
+        <div class="course-block" style="margin-bottom: 25px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+            <h4 style="margin: 0;">{{this.title}}</h4>
+            <p style="margin-top: 5px;">{{this.description}}</p>
+
+            {{#if this.modules.length}}
+            <ul style="margin-top: 10px; padding-left: 20px;">
+                {{#each this.modules}}
+                <li style="margin-bottom: 10px;">
+                    <strong>{{this.title}}</strong> — {{this.description}}
+
+                    {{#if this.lessons.length}}
+                    <ul style="margin-top: 5px; padding-left: 20px;">
+                        {{#each this.lessons}}
+                        <li>
+                            <strong>{{this.title}}</strong>: {{this.content}}
+                        </li>
+                        {{/each}}
+                    </ul>
+                    {{else}}
+                    <p style="color: #888;">Нет уроков</p>
+                    {{/if}}
+                </li>
+                {{/each}}
+            </ul>
+            {{else}}
+            <p style="color: #888;">Нет модулей</p>
+            {{/if}}
+        </div>
+        {{/each}}
+
+        <hr>
+
+        <h3>Тренировки клиента</h3>
+        {{#if activeWorkouts.length}}
+        <ul style="padding-left: 20px;" class="activeWorkoutsList">
+            {{#each activeWorkouts}}
+            <li style="margin-bottom: 10px;">
+                <strong>{{this.Workout.title}}</strong> — {{this.Workout.description}}<br />
+                <small>Назначено: {{normalizeDate this.date}}</small><br />
+                <small>Тренер: {{this.User.fio}}</small>
+            </li>
+            {{/each}}
+        </ul>
+        {{else}}
+        <p style="color: #888;" class="passiveWorkoutsList">Тренировок пока нет</p>
+        {{/if}}
+
+        <hr>
+
+        <button class="open-popup-btn" data-popup="assignWorkoutPopup" onclick="openPopup('assignWorkoutPopup')" style="margin-top: 20px;">Назначить
+            тренировку</button>
+    </div>
+</section>
+
+<template id="assignWorkoutPopup">
+    <form id="assignWorkoutForm">
+        <h2 style="margin-bottom: 15px;">Назначить тренировку</h2>
+
+        <label for="workoutId">Тренировка</label>
+        <select name="workoutId" required>
+            <option value="" disabled selected>Выберите тренировку</option>
+            {{#each allWorkouts}}
+            <option value="{{this.id}}">{{this.title}}</option>
+            {{/each}}
+        </select>
+
+        <label for="date">Дата</label>
+        <input type="date" name="date" required />
+
+        <button type="submit" class="submit-btn">Назначить</button>
+    </form>
+</template>
+
+<script src="/scripts/client.js"></script>

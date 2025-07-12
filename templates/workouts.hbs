@@ -1,0 +1,41 @@
+<div class="page-header">
+    <h1>Тренировки</h1>
+    <button class="open-popup-btn" onclick="openPopup('createWorkoutPopup')">Создать тренировку</button>
+    <div class="coach-list">
+        {{#each workouts}}
+        <a href="/workout/{{this.id}}" class="coach-card" data-id="{{this.id}}" data-type="workouts">
+            <button class="delete-btn course-{{this.id}}">&times;</button>
+            <h3>{{this.title}}</h3>
+            <p class="course-description">{{this.description}}</p>
+        </a>
+        {{/each}}
+    </div>
+</div>
+
+<!-- Шаблон попапа -->
+<template id="createWorkoutPopup">
+    <form id="createWorkoutForm" class="popup-form workout-form">
+        <label>Название тренировки</label>
+        <input type="text" name="title" required />
+
+        <label>Описание</label>
+        <input type="text" name="description" />
+
+        <label>Категория</label>
+        <select name="tag" id="tag">
+            {{#each tags}}
+            <option value="{{this.id}}">{{this.name}}</option>
+            {{/each}}
+        </select>
+
+        <div class="workout-items">
+            <h3>Упражнения</h3>
+            <div id="itemsContainer"></div>
+            <button type="button" id="addWorkoutItem" class="add-btn">+</button>
+        </div>
+
+        <button type="submit" class="submit-btn">Создать</button>
+    </form>
+</template>
+
+<script src="/scripts/workouts.js"></script>

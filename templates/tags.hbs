@@ -1,0 +1,24 @@
+<div class="content-header">
+    <h1>Теги</h1>
+    <button onclick="openPopup('createTagForm')" class="btn">+ Добавить тег</button>
+</div>
+
+
+<div class="coach-list">
+    {{#each tags}}
+    <a href="/" class="coach-card" data-id="{{this.id}}" data-type="tag">
+      <button class="delete-btn tag-{{this.id}}">&times;</button>
+      <h3>{{this.name}}</h3>
+    </a>
+    {{/each}}
+  </div>
+
+<div id="createTagForm" style="display: none;">
+    <form method="post">
+        <h2>Создать тег</h2>
+        <input type="text" name="tag" placeholder="Название тега" required />
+        <button type="submit" class="btn">Создать</button>
+    </form>
+</div>
+
+<script src="/scripts/tags.js"></script>

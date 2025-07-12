@@ -4,7 +4,7 @@ const { User, Module, Course, Lesson, FAQ } = require('../models/associations.js
 
 bot.on('text', async (msg) => {
     if (msg.text === '/start') {
-        await bot.sendMessage(msg.chat.id, 'Отправьте ваш номер для авторизации!')
+        bot.sendMessage(msg.chat.id, 'Отправьте ваш номер для авторизации!')
     }
     if (msg.text.match(/^(\+7|8)[0-9]{10}$/)) {
         console.log(msg.text)
@@ -22,7 +22,7 @@ bot.on('text', async (msg) => {
             ]
             const resultMsg = `Здравствуйте, ${client.fio}!`;
 
-            await bot.sendMessage(msg.chat.id, resultMsg, {
+            bot.sendMessage(msg.chat.id, resultMsg, {
                 reply_markup: {
                     inline_keyboard: callbackButtons,
                     resize_keyboard: true
@@ -30,7 +30,7 @@ bot.on('text', async (msg) => {
             })
         }
         else {
-            await bot.sendMessage(msg.chat.id, 'Клиент не найден!')
+            bot.sendMessage(msg.chat.id, 'Клиент не найден!')
         }
     } else {
         console.log(msg.text, msg.text.match(/^(\+7|8)[0-9]{10}$/))
@@ -48,7 +48,7 @@ bot.on('callback_query', async (callback) => {
         ]
         const resultMsg = `Здравствуйте, ${client.fio}!`;
 
-        await bot.sendMessage(callback.from.id, resultMsg, {
+        bot.sendMessage(callback.from.id, resultMsg, {
             reply_markup: {
                 inline_keyboard: callbackButtons,
                 resize_keyboard: true
@@ -59,14 +59,20 @@ bot.on('callback_query', async (callback) => {
         const client = await User.findOne({ where: { role: 'client', telegramId: callback.from.id } })
         const trenerId = callback.data.split('_')[1];
         const trener = await User.findOne({ where: { id: trenerId } })
-        const courses = await Course.findAll({ where: { UserId: trener.id } })
+        let courses;
+        if (!client.TagId) {
+            courses = await Course.findAll({ where: { UserId: trener.id } })
+        }
+        else {
+            courses = await Course.findAll({ where: { UserId: trener.id, TagId: client.TagId } })
+        }
         console.log(courses)
         const callbackCourses = []
         const resultMsg = `Ваши курсы от тренера ${trener.fio}:`;
         for (let course of courses) {
             callbackCourses.push([{ text: course.title, callback_data: `course_${course.id}` }])
         }
-        await bot.sendMessage(callback.from.id, resultMsg, {
+        bot.sendMessage(callback.from.id, resultMsg, {
             reply_markup: {
                 inline_keyboard: [...callbackCourses, [{ text: '<<< Назад', callback_data: `getMain_${client.id}` }]],
                 resize_keyboard: true
@@ -75,20 +81,23 @@ bot.on('callback_query', async (callback) => {
     }
     if (callback.data.match(/^trenerFAQ_[0-9]+$/)) {
         const client = await User.findOne({ where: { role: 'client', telegramId: callback.from.id } })
+        console.log(client, callback.from.id)
         const trenerId = callback.data.split('_')[1];
         const trener = await User.findOne({ where: { id: trenerId } })
         const FAQs = await FAQ.findAll({ where: { UserId: trenerId } })
         const callbackFAQs = []
-        const resultMsg = `Часто задаваемые вопросы:\n\n`;
+        const resultMsg = `Часто задаваемые вопросы:`;
         for (let faq of FAQs) {
-            callbackFAQs.push(`${faq.question}\n${faq.answer}`)
+            callbackFAQs.push([{ text: faq.question, callback_data: `faq_${faq.id}` }])
         }
-        await bot.sendMessage(callback.from.id, resultMsg+callbackFAQs.join('\n\n'), {
+        bot.sendMessage(callback.from.id, resultMsg, {
             reply_markup: {
-                inline_keyboard: [[{ text: '<<< Назад', callback_data: `getMain_${client.id}` }]],
+                inline_keyboard: [...callbackFAQs, [{ text: '<<< Назад', callback_data: `getMain_${client.id}` }]],
                 resize_keyboard: true
             }
         })
+        bot.deleteMessage(callback.from.id, callback.message.message_id)
+
     }
     if (callback.data.match(/^trenerInfo_[0-9]+$/)) {
         const client = await User.findOne({ where: { role: 'client', telegramId: callback.from.id } })
@@ -96,7 +105,7 @@ bot.on('callback_query', async (callback) => {
         const trener = await User.findOne({ where: { id: trenerId } })
         const callbackInfo = [`Ваш тренер: \n${trener.fio}\n${trener.phone}\n и тд.`]
         const resultMsg = `Информация:\n\n`;
-        await bot.sendMessage(callback.from.id, resultMsg+callbackInfo.join('\n\n'), {
+        bot.sendMessage(callback.from.id, resultMsg + callbackInfo.join('\n\n'), {
             reply_markup: {
                 inline_keyboard: [[{ text: '<<< Назад', callback_data: `getMain_${client.id}` }]],
                 resize_keyboard: true
@@ -115,17 +124,17 @@ bot.on('callback_query', async (callback) => {
         for (let module of modules) {
             callbackModules.push([{ text: module.title, callback_data: `module_${module.id}` }])
         }
-        await bot.sendMessage(callback.from.id, resultMsg, {
+        bot.sendMessage(callback.from.id, resultMsg, {
             reply_markup: {
                 inline_keyboard: [...callbackModules, [{ text: '<<< Назад', callback_data: `trener_${trener.id}` }]],
                 resize_keyboard: true
             }
         })
-        await bot.deleteMessage(callback.from.id, toDeleteMsgId)
+        bot.deleteMessage(callback.from.id, toDeleteMsgId)
     }
 
     if (callback.data.match(/^module_[0-9]+$/)) {
-        const toDeleteMsgId = callback.message.message_id;
+        const toDeleteMsgId = callback.id;
         const moduleId = callback.data.split('_')[1];
         const module = await Module.findOne({ where: { id: moduleId } })
         const lessons = await Lesson.findAll({ where: { ModuleId: moduleId } });
@@ -134,13 +143,13 @@ bot.on('callback_query', async (callback) => {
         for (let lesson of lessons) {
             callbackLessons.push([{ text: lesson.title, callback_data: `lesson_${lesson.id}` }])
         }
-        await bot.sendMessage(callback.from.id, resultMsg, {
+        bot.sendMessage(callback.from.id, resultMsg, {
             reply_markup: {
                 inline_keyboard: [...callbackLessons, [{ text: '<<< Назад', callback_data: `course_${module.CourseId}` }]],
                 resize_keyboard: true
             }
         })
-        await bot.deleteMessage(callback.from.id, toDeleteMsgId)
+        bot.deleteMessage(callback.from.id, toDeleteMsgId)
     }
     if (callback.data.match(/^lesson_[0-9]+$/)) {
         const toDeleteMsgId = callback.message.message_id;
@@ -148,7 +157,7 @@ bot.on('callback_query', async (callback) => {
         const lesson = await Lesson.findOne({ where: { id: lessonId } });
         const resultMsg = `${lesson.title}:\n${lesson.content}`;
 
-        await bot.sendMessage(callback.from.id, resultMsg, {
+        bot.sendMessage(callback.from.id, resultMsg, {
             reply_markup: {
                 inline_keyboard: [
                     [{ text: '<<< Назад', callback_data: `module_${lesson.ModuleId}` }]
@@ -156,7 +165,15 @@ bot.on('callback_query', async (callback) => {
                 resize_keyboard: true
             }
         })
-        await bot.deleteMessage(callback.from.id, toDeleteMsgId)
+        bot.deleteMessage(callback.from.id, toDeleteMsgId)
+    }
+    if (callback.data.match(/^faq_[0-9]+$/)) {
+        const toDeleteMsgId = callback.message.message_id;
+        const faqId = callback.data.split('_')[1];
+        const faq = await FAQ.findOne({ where: { id: faqId } });
+        const resultMsg = `${faq.question}:\n${faq.answer}`;
+        console.log(toDeleteMsgId)
+        await bot.answerCallbackQuery(callback.id, { text: resultMsg, show_alert: true })
     }
     if (callback.data.match(/^trener_[0-9]+$/)) {
         const client = await User.findOne({ where: { telegramId: callback.from.id } })
@@ -170,13 +187,13 @@ bot.on('callback_query', async (callback) => {
             callbackCourses.push([{ text: course.title, callback_data: `course_${course.id}` }])
         }
         console.log(callbackCourses)
-        await bot.sendMessage(callback.from.id, resultMsg, {
+        bot.sendMessage(callback.from.id, resultMsg, {
             reply_markup: {
                 inline_keyboard: [...callbackCourses, [{ text: '<<< Назад', callback_data: `getMain_${client.id}` }]],
                 resize_keyboard: true
             }
         })
-        await bot.deleteMessage(callback.from.id, toDeleteMsgId)
+        bot.deleteMessage(callback.from.id, toDeleteMsgId)
     }
 })
 

@@ -10,6 +10,7 @@ dotenv.config()
 const mainRouter = require('./routes/mainRoutes.js')
 
 // other utils
+const manageWorkouts = require('./utils/manageWorkouts.js')
 const hbsConfig = require('./utils/hbsConfig');
 const cookieParser = require('cookie-parser')
 const associations = require('./models/associations.js')
@@ -35,6 +36,7 @@ async function main() {
         await sequelize.sync()
         const bot = require('./bot/bot.js')
         app.listen(3000, () => console.log('server alive!'))
+        manageWorkouts()
         app.use(authChecker)
         app.use(mainRouter)
     }

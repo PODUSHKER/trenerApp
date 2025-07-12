@@ -1,7 +1,7 @@
-const { User, Course, Lesson, Module, FAQ, Answer, Polling } = require('../models/associations.js')
+const { User, Course, Lesson, Module, FAQ, Answer, Polling, Tag, Workout, WorkoutItem, Unit, ActiveWorkout } = require('../models/associations.js')
 const bcrypt = require('bcrypt');
-const { raw } = require('express');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const slugify = require('slugify')
 
 
 exports.getMain = function (request, response) {
@@ -15,13 +15,12 @@ exports.getLogin = function (request, response) {
 
 exports.postLogin = async function (request, response) {
     const { login, password } = request.body;
-    console.log(login)
     const user = await User.findOne({ where: { login }, raw: true })
     if (user) {
         const isValid = await bcrypt.compare(password, user.password);
         if (isValid) {
             const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' })
-            console.log(token)
+
             response.cookie('token', token)
             return response.redirect('/')
         }
@@ -34,22 +33,23 @@ exports.postLogin = async function (request, response) {
 
 exports.getTreners = async function (request, response) {
     const treners = await User.findAll({ where: { role: 'trener' }, raw: true })
-    return response.render('treners.hbs', { treners, script: 'treners.js' })
+    return response.render('treners.hbs', { treners })
 }
 
 
 exports.getClients = async function (request, response) {
-    const clients = await User.findAll({ where: { role: 'client' }, raw: true })
-    return response.render('clients.hbs', { clients, script: 'clients.js' })
+    const clients = await User.findAll({ where: { role: 'client' }, raw: true, nest: true, include: Tag })
+    const tags = await Tag.findAll({})
+    return response.render('clients.hbs', { clients, tags })
 }
 
 exports.postCreateTrener = async function (request, response) {
     const { password, ...other } = request.body;
-    console.log(other, password)
+
     const isValid = Object.values({ ...other, password }).every((el) => !!el)
 
     const resMessage = { success: true }
-    console.log(isValid)
+
     if (!isValid) {
         return response.json(JSON.stringify(resMessage))
     }
@@ -61,16 +61,17 @@ exports.postCreateTrener = async function (request, response) {
     return response.json(resMessage)
 }
 exports.postCreateClient = async function (request, response) {
-    const { fio, phone } = request.body;
-    const isValid = Object.values({ fio, phone }).every((el) => !!el)
+    const { fio, phone, tag: tagId } = request.body;
+
+    const isValid = Object.values({ fio, phone, tagId }).every((el) => !!el)
 
     const resMessage = { success: true }
-    console.log(isValid)
     if (!isValid) {
         return response.json(JSON.stringify(resMessage))
     }
-    const user = await User.create({ fio, phone, role: 'client', trenerId: response.locals['User'].id });
-    resMessage['body'] = { success: true, fio: user.fio, phone: user.phone, id: user.id }
+    const tagName = (await Tag.findOne({ where: { id: tagId } })).name
+    const user = await User.create({ fio, phone, role: 'client', trenerId: response.locals['User'].id, TagId: tagId });
+    resMessage['body'] = { success: true, fio: user.fio, phone: user.phone, id: user.id, tagName }
 
     return response.json(resMessage)
 }
@@ -87,7 +88,7 @@ exports.getTrener = async function (request, response) {
     const courses = await Promise.all(rawCourses.map(async (el1) => {
         const modules = await Module.findAll({ where: { CourseId: el1.id }, raw: true });
         await Promise.all(modules.map(async (el2) => {
-            console.log(el2)
+
 
             const lessons = await Lesson.findAll({ where: { ModuleId: el2.id }, raw: true })
             el2['lessons'] = lessons;
@@ -97,7 +98,7 @@ exports.getTrener = async function (request, response) {
         return el1;
     }))
     const clients = await User.findAll({ where: { role: 'client', trenerId: trener.id } })
-    console.log(clients)
+
     return response.render('trener.hbs', { trener, courses, clients })
 }
 
@@ -115,29 +116,35 @@ exports.getPollings = async function (request, response) {
     await Promise.all(pollings.map(async (el) => {
         const answers = await Answer.findAll({ where: { PollingId: el.id }, raw: true });
         el['answers'] = answers;
-        console.log(el)
+
         return el;
     }))
-    console.log(pollings)
+
     return response.render('pollings.hbs', { pollings })
 }
 
 
 exports.getCourses = async function (request, response) {
-    const courses = await Course.findAll({ where: { UserId: response.locals['User'].id }, raw: true })
-    return response.render('courses.hbs', { courses })
+    const tags = await Tag.findAll({})
+    const courses = (await Course.findAll({ where: { UserId: response.locals['User'].id }, raw: true, nest: true, include: Tag })).map(el => {
+        const descr = el.description.length > 135 ? el.description.slice(0, 135) + '...' : el.description;
+        el['description'] = descr;
+        return el;
+    })
+
+
+    return response.render('courses.hbs', { courses, tags })
 }
 
 
 exports.createCourse = async function (request, response) {
-    console.log(request.body)
     const isValid = Object.values(request.body).every(el => !!el)
     if (!isValid) {
         return request.json({ success: false })
     }
-    const { courseTitle, courseDescription, modules } = request.body;
+    const { courseTitle, courseDescription, modules, tag } = request.body;
     const trenerId = response.locals['User'].id
-    const course = await Course.create({ title: courseTitle, description: courseDescription, UserId: trenerId });
+    const course = await Course.create({ title: courseTitle, description: courseDescription, UserId: trenerId, TagId: tag });
     await Promise.all(modules.map(async (el) => {
         const modulel = await Module.create({ title: el.title, description: el.description, CourseId: course.id })
         Promise.all(el.lessons.map(async (el2) => {
@@ -170,7 +177,7 @@ exports.createLesson = async function (request, response) {
     }
     const course = await Course.findOne({ where: { id: request.params['id'] } })
     const lesson = await Lesson.create({ title, content, CourseId: course.id })
-    console.log(request.body)
+
     return response.json({ title: lesson.title, content: lesson.content, id: lesson.id, success: true })
 }
 
@@ -184,7 +191,7 @@ exports.updateLesson = async function (request, response) {
     return response.json({ success: true })
 }
 exports.deleteLesson = async function (request, response) {
-    console.log('im here serv')
+
     await Lesson.destroy({ where: { id: request.params['lessonId'] } })
     return response.json({ success: true })
 }
@@ -230,7 +237,7 @@ exports.deleteFAQ = async function (request, response) {
 }
 
 exports.createPolling = async function (request, response) {
-    console.log(request.body)
+
 
     const { question, answers } = request.body;
     const isValid = [question, ...answers].every(el => !!el);
@@ -238,7 +245,7 @@ exports.createPolling = async function (request, response) {
         return { success: false }
     }
     const polling = await Polling.create({ question, UserId: response.locals['User'].id })
-    console.log(polling.id)
+
     await Promise.all(answers.map(el => Answer.create({ data: el, PollingId: polling.id })))
     return response.json({ success: true, id: polling.id, question, answers })
 }
@@ -271,3 +278,97 @@ exports.deleteTrener = async function (request, response) {
     return response.json({ success: true })
 }
 
+
+
+exports.getTags = async function (request, response) {
+    const tags = await Tag.findAll({})
+    return response.render('tags.hbs', { tags })
+}
+
+
+exports.createTag = async function (request, response) {
+    const tagName = request.body['tag'];
+    if (!tagName) {
+        return response.json({ success: false })
+    }
+    const tag = await Tag.create({ name: tagName, value: slugify(tagName) })
+    return response.json({ tagName: tag.name, id: tag.id, success: true })
+}
+
+exports.deleteTag = async function (request, response) {
+    const tagId = request.params['id'];
+    await Tag.destroy({ where: { id: tagId } })
+    return response.json({ success: true })
+}
+
+exports.getWorkouts = async function (request, response) {
+    const tags = await Tag.findAll({});
+    const workouts = await Workout.findAll({ where: { UserId: response.locals['User'].id } })
+    return response.render('workouts.hbs', { workouts, tags })
+}
+
+
+exports.createWorkout = async function (request, response) {
+
+    const { title, description, items, tag } = request.body;
+    const isValid = Object.values(request.body).every(el => !!el)
+    if (!isValid) {
+        return response.json({ success: false })
+    }
+    const workout = await Workout.create({ title, description, UserId: response.locals['User'].id, TagId: tag })
+    await Promise.all(items.map(async (el) => {
+        const { unit, ...other } = el;
+        WorkoutItem.create({ ...other, WorkoutId: workout.id, UnitId: unit })
+    }))
+    return response.json({ success: true })
+}
+
+
+exports.getUnits = async function (request, response) {
+    const units = await Unit.findAll({ raw: true });
+    return response.json({ units })
+}
+
+
+exports.getClient = async function (request, response) {
+    const client = await User.findOne({ where: { role: 'client', id: request.params['id'] }, raw: true, nest: true, include: Tag })
+
+    const activeWorkouts = await ActiveWorkout.findAll({ where: { clientId: client.id }, raw: true, nest: true, include: [Workout, User] })
+    activeWorkouts
+
+    const allWorkouts = await Workout.findAll({ where: { TagId: client.TagId, UserId: client.trenerId }, raw: true })
+    const rawCourses = await Course.findAll({ where: { TagId: client.TagId }, raw: true })
+    const courses = await Promise.all(rawCourses.map(async (el1) => {
+        const modules = await Module.findAll({ where: { CourseId: el1.id }, raw: true });
+        await Promise.all(modules.map(async (el2) => {
+
+
+            const lessons = await Lesson.findAll({ where: { ModuleId: el2.id }, raw: true })
+            el2['lessons'] = lessons;
+            return el2;
+        }))
+        el1['modules'] = modules;
+        return el1;
+    }))
+    return response.render('client.hbs', { client, activeWorkouts, allWorkouts, courses })
+}
+
+
+exports.deleteWorkout = async function (request, response) {
+    const workoutId = request.params['id'];
+    await Workout.destroy({ where: { id: workoutId } })
+    return response.json({ success: true })
+}
+
+
+exports.assignWorkout = async function (request, response) {
+    const date = new Date(request.body['date']);
+    const { WorkoutId, clientId } = request.body;
+    const activeWorkout = await ActiveWorkout.create({ date, WorkoutId, UserId: response.locals['User'].id, clientId });
+    const workout = await Workout.findOne({ where: { id: activeWorkout.WorkoutId } });
+    const trener = await User.findOne({ where: { id: activeWorkout.UserId } });
+    activeWorkout['Workout'] = workout;
+    activeWorkout['User'] = trener;
+
+    return response.json({ success: true, ...activeWorkout })
+}

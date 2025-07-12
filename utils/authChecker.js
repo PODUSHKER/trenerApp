@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models/associations.js');
-const { resourceUsage } = require('process');
 
 async function authChecker(request, response, next) {
     const token = request.cookies['token'];
@@ -10,6 +9,10 @@ async function authChecker(request, response, next) {
         if (user) {
             response.locals['User'] = user;
             return next()
+        }
+        else {
+            response.clearCookie('token')
+            return response.redirect('/login')
         }
     }
     else if (request.originalUrl !== '/login') {

@@ -19,6 +19,9 @@ const hbsConfig = expressHbs.engine({
             return descr.length > 135? descr.slice(0, 135)+'...' : descr;
         },
         isTrener(role) { return role === 'trener' },
+        normalizeDate(date){
+            return new Date(date).toLocaleDateString()
+        }
 
     }
 })

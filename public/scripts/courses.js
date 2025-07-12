@@ -90,6 +90,7 @@ async function dataSendListener() {
 
         const courseTitle = form.querySelector('.courseTitle').value.trim();
         const courseDescription = form.querySelector('.courseDescription').value.trim();
+        const tag = form.querySelector('select[name="tag"]').value;
 
         const modules = [];
 
@@ -111,7 +112,8 @@ async function dataSendListener() {
         const data = {
             courseTitle,
             courseDescription,
-            modules
+            modules,
+            tag
         };
 
         const response = await (await fetch('/createCourse', {

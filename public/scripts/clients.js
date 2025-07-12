@@ -9,16 +9,22 @@ async function dataSendListener() {
                 acc[el.name] = el.value;
                 return acc
             }, {})
+            const tag = form.querySelector('select[name="tag"]')
+            console.log(tag)
+            
             const response = await (await fetch('/createClient', {
                 method: 'post',
-                body: JSON.stringify(data),
+                body: JSON.stringify({...data, tag: tag.value}),
                 headers: {
                     'Content-Type': 'application/json'
                 }
             })).json()
+
             if (response.success) {
                 const card = `
-                <a href="/trener/${response.body['id']}" class="coach-card">
+                <a href="/client/${response.body['id']}" class="coach-card" data-id="${response.body['id']}" data-type="client">
+                    <button class="delete-btn client-${response.body['id']}">&times;</button>
+                    <p>${response.body['tagName']}</p>
                     <h3>${response.body['fio']}</h3>
                     <p>${response.body['phone']}</p>
                 </a>`

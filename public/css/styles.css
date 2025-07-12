@@ -676,3 +676,130 @@ html {
 }
 
 
+/* Стили для select */
+select {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  background-color: white;
+  color: #333;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 1em;
+}
+
+select:focus {
+  outline: none;
+  border-color: #00bcd4;
+  box-shadow: 0 0 6px rgba(0, 188, 212, 0.4);
+}
+
+/* Стили для option */
+option {
+  padding: 8px;
+  background-color: white;
+  color: #333;
+}
+
+/* Стили для hover состояния option */
+option:hover {
+  background-color: #00bcd4;
+  color: white;
+}
+
+/* Стили для активного/выбранного option */
+option:checked {
+  background-color: #00bcd4;
+  color: white;
+}
+
+/* Стили для группы опций */
+optgroup {
+  font-weight: bold;
+  color: #555;
+}
+
+
+
+/* workout --- */
+
+/* Форма внутри попапа */
+.popup-form.workout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  background: transparent; /* Убираем фон, чтобы не лез на карточку */
+  box-shadow: none;        /* Убираем тень */
+  padding: 0;              /* Обнуляем отступы — они задаются контейнером */
+}
+
+/* Внутренние поля формы */
+.popup-form.workout-form input,
+.popup-form.workout-form select {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Блок упражнений */
+.workout-items h3 {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.workout-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+/* Кнопки */
+.add-btn {
+  background-color: #ff69b4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 22px;
+  width: 36px;
+  height: 36px;
+  line-height: 20px;
+  cursor: pointer;
+  display: block;
+  margin: 10px auto;
+}
+
+.remove-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background: #8b5cf6;
+  color: white;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 16px;
+  cursor: pointer;
+}

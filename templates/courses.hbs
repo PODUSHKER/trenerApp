@@ -7,8 +7,9 @@
     {{#each courses}}
     <a href="/course/{{this.id}}" class="coach-card" data-id="{{this.id}}" data-type="course">
       <button class="delete-btn course-{{this.id}}">&times;</button>
+      <p class="course-description">{{this.Tag.name}}</p>
       <h3>{{this.title}}</h3>
-      <p class="course-description">{{this.shortDescription}}</p>
+      <p class="course-description">{{this.description}}</p>
     </a>
     {{/each}}
   </div>
@@ -20,7 +21,12 @@
     <h3>Создать курс</h3>
     <input type="text" name="title" class="courseTitle" placeholder="Название курса" required />
     <textarea name="description" class="courseDescription" placeholder="Описание курса" rows="4" required></textarea>
-
+    <h4>Категория</h4>
+    <select name="tag" id="tag">
+      {{#each tags}}
+      <option value="{{this.id}}">{{this.name}}</option>
+      {{/each}}
+    </select>
     <h4>Модули</h4>
     <div id="moduleContainer"></div>
 
@@ -28,6 +34,7 @@
       <input type="text" id="moduleTitleInput" placeholder="Название модуля" />
       <textarea id="moduleDescriptionInput" placeholder="Описание модуля" rows="2"></textarea>
 
+      <h5>Уроки</h5>
       <div class="lessonContainer"></div>
 
       <div class="lesson-form">

@@ -26,6 +26,7 @@ mainRouter.post('/course/:id/deleteLesson/:lessonId', mainControllers.deleteLess
 
 
 mainRouter.get('/clients', mainControllers.getClients)
+mainRouter.get('/client/:id', mainControllers.getClient)
 mainRouter.post('/createClient', mainControllers.postCreateClient);
 mainRouter.post('/deleteClient/:id', mainControllers.deleteClient);
 
@@ -43,6 +44,19 @@ mainRouter.get('/treners', mainControllers.getTreners);
 mainRouter.get('/trener/:id', mainControllers.getTrener);
 mainRouter.post('/createTrener', mainControllers.postCreateTrener);
 mainRouter.post('/deleteTrener/:id', mainControllers.deleteTrener);
+
+mainRouter.get('/tags', mainControllers.getTags)
+mainRouter.post('/createTag', mainControllers.createTag)
+mainRouter.post('/deleteTag/:id', mainControllers.deleteTag)
+
+mainRouter.get('/workouts', mainControllers.getWorkouts)
+mainRouter.post('/createWorkout', mainControllers.createWorkout)
+mainRouter.post('/deleteWorkout/:id', mainControllers.deleteWorkout)
+
+
+mainRouter.post('/getUnits', mainControllers.getUnits);
+
+mainRouter.post('/assignWorkout', mainControllers.assignWorkout);
 
 // mainRouter.get('/trener', mainControllers.postCreateTrener);
 
